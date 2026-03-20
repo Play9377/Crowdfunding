@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>支持作者</title>
+    <style>
+        :root {
+            --wechat-green: #07c160;
+            --alipay-blue: #1677ff;
+            --paypal-blue: #0070ba;
+            --usdt-teal: #26a17b;
+            --bg-color: #f8f9fa;
+        }
+        
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; background: var(--bg-color); margin: 0; padding: 20px; display: flex; justify-content: center; }
+        
+        .container { background: #fff; width: 100%; max-width: 450px; border-radius: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.05); overflow: hidden; }
+        .header { padding: 30px 20px; text-align: center; background: linear-gradient(135deg, #6e8efb, #a777e3); color: #fff; }
+        .header h2 { margin: 0; font-size: 20px; }
+        .header p { margin: 10px 0 0; font-size: 13px; opacity: 0.9; }
+
+        /* 移动端横向滑动标签栏 */
+        .tabs { display: flex; border-bottom: 1px solid #eee; background: #fff; overflow-x: auto; scrollbar-width: none; }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab-btn { flex: 1; min-width: 80px; padding: 15px 0; text-align: center; font-size: 14px; color: #666; cursor: pointer; border-bottom: 3px solid transparent; transition: 0.3s; }
+        .tab-btn.active { color: #333; font-weight: bold; border-bottom-color: #6e8efb; }
+
+        .content-wrapper { padding: 30px 20px; text-align: center; min-height: 320px; }
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* 二维码适配 */
+        .qr-wrapper { position: relative; width: 220px; height: 220px; margin: 0 auto 15px; border: 1px solid #f0f0f0; padding: 10px; border-radius: 12px; }
+        .qr-code { width: 100%; height: 100%; object-fit: contain; }
+        
+        /* 按钮样式 */
+        .action-btn { display: block; width: 100%; padding: 14px; border-radius: 12px; text-decoration: none; font-size: 15px; font-weight: bold; margin-top: 10px; border: none; cursor: pointer; transition: opacity 0.2s; }
+        .action-btn:active { opacity: 0.8; }
+        
+        .btn-alipay { background: var(--alipay-blue); color: #fff; }
+        .btn-paypal { background: var(--paypal-blue); color: #fff; }
+        .btn-copy { background: #f0f0f0; color: #333; }
+
+        /* USDT 地址显示 */
+        .crypto-address { background: #fdfdfd; border: 1px dashed #ddd; padding: 15px; font-family: monospace; font-size: 13px; word-break: break-all; margin: 15px 0; border-radius: 8px; color: #444; position: relative; }
+        .hint { font-size: 12px; color: #999; margin-top: 8px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h2>打赏支持</h2>
+        <p>如果我的作品对你有帮助，欢迎请我喝杯咖啡</p>
+    </div>
+
+    <div class="tabs">
+        <div class="tab-btn active" onclick="switchTab(event, 'wechat')">微信</div>
+        <div class="tab-btn" onclick="switchTab(event, 'alipay')">支付宝</div>
+        <div class="tab-btn" onclick="switchTab(event, 'us_wallet')">美国钱包</div>
+        <div class="tab-btn" onclick="switchTab(event, 'usdt')">USDT</div>
+    </div>
+
+    <div class="content-wrapper">
+        <!-- 微信 -->
+        <div id="wechat" class="tab-content active">
+            <div class="qr-wrapper">
+                <img class="qr-code" src="wechat.png" alt="微信收款码">
+            </div>
+            <p class="hint">长按上方二维码，保存或扫码支付</p>
+        </div>
+
+        <!-- 支付宝 -->
+        <div id="alipay" class="tab-content">
+            <div class="qr-wrapper">
+                <img class="qr-code" src="alipay.png" alt="支付宝收款码">
+            </div>
+            <a href="alipays://platformapi/startapp?saId=10000007" class="action-btn btn-alipay">尝试打开支付宝 App</a>
+        </div>
+
+        <!-- 美国钱包 -->
+        <div id="us_wallet" class="tab-content">
+            <div style="padding: 20px 0;">
+                <p style="color:#444">支持 PayPal、Venmo 或信用卡</p>
+                <a href="https://paypal.me/Fly4024" target="_blank" class="action-btn btn-paypal">使用 PayPal 支付</a>
+                <p class="hint">点击后将在新窗口打开支付页面</p>
+            </div>
+        </div>
+
+        <!-- USDT -->
+        <div id="usdt" class="tab-content">
+            <p style="color: var(--usdt-teal); font-weight: bold;">USDT (TRC-20)</p>
+            <div class="crypto-address" id="usdt-addr">TVpQGTxEJPrfEEWQW5xoSa1h2LBf6a8qyq</div>
+            <button class="action-btn btn-copy" onclick="copyAddress()">复制钱包地址</button>
+            <p class="hint">请务必确认网络为 TRC-20 (波场)</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    function switchTab(event, tabId) {
+        // 切换 Tab 按钮
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+
+        // 切换内容
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+    }
+
+    function copyAddress() {
+        const address = document.getElementById('usdt-addr').innerText;
+        // 兼容移动端的复制方法
+        const textArea = document.createElement("textarea");
+        textArea.value = address;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            alert('地址已复制到剪贴板');
+        } catch (err) {
+            alert('复制失败，请手动长按复制');
+        }
+        document.body.removeChild(textArea);
+    }
+</script>
+
+</body>
+</html>
