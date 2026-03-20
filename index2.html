@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>赏个鸡腿 · 微信/支付宝打赏</title>
+    <!-- Font Awesome 5 (免费品牌图标库) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f5f7fa 0%, #f0f2f5 100%);
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            margin: 0;
+            color: #1e2a3a;
+        }
+
+        .reward-container {
+            max-width: 820px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(4px);
+            border-radius: 3rem 3rem 2rem 2rem;
+            box-shadow: 0 25px 45px -12px rgba(0, 20, 30, 0.25), inset 0 1px 2px rgba(255,255,255,0.8);
+            padding: 2.5rem 1.5rem 2rem 1.5rem;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            text-align: center;
+            background: linear-gradient(135deg, #1e2f4b, #2c3e5e);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        h1 i {
+            font-size: 2rem;
+            color: #b8860b;
+            background: rgba(255,215,0,0.15);
+            padding: 0.3rem;
+            border-radius: 50%;
+        }
+
+        .subhead {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #4a5a6e;
+            margin-bottom: 2.5rem;
+            border-bottom: 1px dashed #cbd5e1;
+            padding-bottom: 1rem;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+        }
+
+        .card-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: stretch;
+            gap: 2rem 1.8rem;
+            margin: 1rem 0 1.5rem;
+        }
+
+        .reward-card {
+            flex: 0 1 300px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 2.5rem 2.5rem 2rem 2rem;
+            padding: 2rem 1.5rem 1.8rem 1.5rem;
+            box-shadow: 0 20px 30px -10px rgba(30, 40, 60, 0.2), 0 0 0 1px rgba(255,255,255,0.7) inset;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.9);
+        }
+
+        .reward-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 30px 40px -14px rgba(0, 30, 50, 0.3), 0 0 0 1px rgba(255,255,255,0.9) inset;
+        }
+
+        /* 微信卡片标志性光晕 */
+        .reward-card.wechat {
+            background: linear-gradient(145deg, #ffffff, #f0fff4);
+        }
+        .reward-card.alipay {
+            background: linear-gradient(145deg, #ffffff, #f0f5ff);
+        }
+
+        .brand-icon-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            box-shadow: 0 8px 14px -4px rgba(0,0,0,0.2), 0 0 0 4px rgba(255,255,255,0.8);
+        }
+
+        .wechat .brand-icon-circle {
+            background: #07C160;  /* 微信绿 */
+        }
+
+        .alipay .brand-icon-circle {
+            background: #1677FF;  /* 支付宝蓝 */
+        }
+
+        .brand-icon-circle i {
+            font-size: 3.2rem;
+            color: white;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+
+        h3 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 1.2rem;
+            letter-spacing: -0.3px;
+        }
+
+        .wechat h3 {
+            color: #07C160;
+            text-shadow: 0 2px 5px rgba(7, 193, 96, 0.2);
+        }
+
+        .alipay h3 {
+            color: #1677FF;
+            text-shadow: 0 2px 5px rgba(22, 119, 255, 0.2);
+        }
+
+        /* 模拟二维码区域 (点阵背景 + 居中品牌icon) */
+        .qr-mock {
+            width: 180px;
+            height: 180px;
+            border-radius: 32px;
+            background-color: #e9eef3;
+            /* 点阵图案 —— 模拟二维码矩阵 */
+            background-image: radial-gradient(#9098a5 1.5px, transparent 1.5px);
+            background-size: 12px 12px;
+            background-position: 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0.8rem 0 1rem 0;
+            box-shadow: 0 10px 20px -8px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.8);
+            transition: all 0.15s ease;
+            position: relative;
+        }
+
+        /* 中心半透明白色圆形，让品牌图标更醒目 */
+        .qr-center-icon {
+            width: 95px;
+            height: 95px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(4px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15), 0 0 0 2px rgba(255,255,255,0.7);
+        }
+
+        .qr-center-icon i {
+            font-size: 4rem;
+            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.1));
+        }
+
+        .wechat .qr-center-icon i {
+            color: #07C160;
+        }
+
+        .alipay .qr-center-icon i {
+            color: #1677FF;
+        }
+
+        .hint-text {
+            font-size: 1rem;
+            font-weight: 500;
+            background: rgba(0,0,0,0.02);
+            padding: 0.5rem 1.2rem;
+            border-radius: 60px;
+            color: #2d3f55;
+            border: 1px solid rgba(255,255,255,0.7);
+            margin: 0.8rem 0 1.2rem 0;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+
+        .wechat .hint-text {
+            background: #e6f7ec;
+            color: #076c39;
+        }
+
+        .alipay .hint-text {
+            background: #e6f0ff;
+            color: #105ac2;
+        }
+
+        /* 小额金额标签 (打赏预设) */
+        .amount-tag {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            justify-content: center;
+            margin: 0.5rem 0 0.2rem;
+        }
+
+        .amount-tag span {
+            background: white;
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #34495e;
+            box-shadow: 0 4px 8px -4px rgba(0,20,30,0.2), 0 0 0 1px rgba(0,0,0,0.02);
+            border: 1px solid rgba(255,255,255,0.7);
+            transition: 0.1s;
+            cursor: default;
+        }
+
+        .wechat .amount-tag span {
+            background: #f0fdf4;
+            color: #1f6e43;
+        }
+
+        .alipay .amount-tag span {
+            background: #f0f7ff;
+            color: #1a509a;
+        }
+
+        .amount-tag span i {
+            font-size: 0.7rem;
+            margin-right: 4px;
+            opacity: 0.8;
+        }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 2.5rem;
+            font-size: 0.95rem;
+            color: #546a7a;
+            border-top: 1px dashed #bac8d9;
+            padding-top: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-note i {
+            color: #f5a623;
+            font-size: 1rem;
+        }
+
+        .footer-note span {
+            background: rgba(255,255,255,0.6);
+            padding: 0.2rem 1rem;
+            border-radius: 50px;
+            font-weight: 400;
+            box-shadow: inset 0 1px 4px white;
+        }
+
+        .footer-note a {
+            color: #1e3b5c;
+            text-decoration: none;
+            border-bottom: 1px dotted;
+        }
+
+        /* 图片替换提示 (占位提醒，不影响视觉) */
+        .qr-mock .replace-tip {
+            display: none;
+        }
+
+        /* 响应式微调 */
+        @media (max-width: 680px) {
+            .reward-container {
+                padding: 1.8rem 1rem 1.5rem;
+                border-radius: 2.2rem;
+            }
+            h1 { font-size: 1.9rem; }
+            .card-grid { gap: 1.5rem; }
+            .qr-mock { width: 160px; height: 160px; }
+            .qr-center-icon { width: 80px; height: 80px; }
+            .qr-center-icon i { font-size: 3.4rem; }
+        }
+
+        @media (max-width: 380px) {
+            .reward-card { flex: 0 1 260px; padding: 1.5rem 1rem; }
+        }
+
+        /* 模拟二维码内可放置真实图片——开发者替换指引 */
+        .qr-mock img.real-qr {
+            /*display: none;   默认隐藏真实图片，如需使用请自行替换样式 */
+        }
+    </style>
+</head>
+<body>
+<div class="reward-container">
+    <h1>
+        <i class="fas fa-crown"></i> 请我吃鸡腿 <i class="fas fa-drumstick-bite"></i>
+    </h1>
+    <div class="subhead">
+        一分支持 · 十分动力 · 随意打赏
+    </div>
+
+    <div class="card-grid">
+        <!-- 微信支付卡片 -->
+        <div class="reward-card wechat">
+            <!-- <div class="brand-icon-circle">
+                <i class="fab fa-weixin"></i>
+            </div> -->
+            <h3>微信支付</h3>
+
+            <!-- 模拟二维码区域 (可替换为真实二维码图片) -->
+            <div class="qr-mock">
+                <!-- 中心醒目的品牌图标，模拟二维码中间的logo效果 -->
+                <!-- <div class="qr-center-icon">
+                    <i class="fab fa-weixin"></i>
+                </div> -->
+                <!-- 提示：如需使用真实收款二维码，请将img标签取消注释，并隐藏上方qr-center-icon。同时调整样式使img填满容器 -->
+                <img class="real-qr" src="wechat.png" alt="微信收款码" style="width:100%; height:100%; border-radius:32px; object-fit:cover;">
+            </div>
+
+            <div class="hint-text">
+                <i class="fas fa-qrcode"></i> 扫一扫 向微信付款
+            </div>
+
+            <!-- 小额常用金额标签 (仅示意，无功能) -->
+            <div class="amount-tag">
+                <span><i class="fas fa-coffee"></i> 6.66</span>
+                <span><i class="fas fa-beer"></i> 8.88</span>
+                <span><i class="fas fa-birthday-cake"></i> 16.66</span>
+            </div>
+            <div style="font-size:0.8rem; margin-top:0.5rem; opacity:0.6; display: flex; gap: 0.5rem;">
+                <i class="fas fa-hand-holding-heart"></i> 备注：你的名字
+            </div>
+        </div>
+
+        <!-- 支付宝支付卡片 -->
+        <div class="reward-card alipay">
+           <!--  <div class="brand-icon-circle">
+                <i class="fab fa-alipay"></i>
+            </div> -->
+            <h3>支付宝</h3>
+
+            <div class="qr-mock">
+                <!-- <div class="qr-center-icon">
+                    <i class="fab fa-alipay"></i>
+                </div> -->
+                <!-- 真实支付宝二维码替换区 -->
+                <img class="real-qr" src="alipay.png" alt="支付宝收款码" style="width:100%; height:100%; border-radius:32px; object-fit:cover;">
+            </div>
+
+            <div class="hint-text">
+                <i class="fas fa-qrcode"></i> 扫一扫 向支付宝付款
+            </div>
+
+            <div class="amount-tag">
+                <span><i class="fas fa-red-envelope"></i> 6.66</span>
+                <span><i class="fas fa-gift"></i> 8.88</span>
+                <span><i class="fas fa-coins"></i> 18.00</span>
+            </div>
+            <div style="font-size:0.8rem; margin-top:0.5rem; opacity:0.6; display: flex; gap: 0.5rem;">
+                <i class="fas fa-smile"></i> 备注：请附上昵称
+            </div>
+        </div>
+    </div>
+
+    <!-- 提示区：如何替换为真实二维码 -->
+    <div class="footer-note">
+        <i class="fas fa-arrow-circle-left"></i>
+        <span>👉 本页面打赏 👈</span>
+        <i class="fas fa-arrow-circle-right"></i>
+    </div>
+    <div class="footer-note" style="margin-top: 0.3rem; border-top: none; padding-top: 0.2rem;">
+        <span style="background: transparent; box-shadow: none; font-size: 0.86rem;">
+            ⚡ 长按以上微信/支付宝收款二维码图片，保存本地，打开对应APP扫码打赏
+        </span>
+    </div>
+    <div class="footer-note" style="border: none; padding-top: 0.8rem; margin-top: 0;">
+        <i class="fas fa-heart" style="color: #ff6b6b;"></i>
+        感谢你的鼓励，让创作更有价值
+        <i class="fas fa-heart" style="color: #ff6b6b;"></i>
+    </div>
+</div>
+
+<!-- 下方简单注释：如何快速替换真实二维码 (对开发者友好) -->
+<!-- 
+    替换指南：
+    1. 找到微信卡片内的 <!-- <img class="real-qr" ... > -- 注释块，去掉注释
+    2. 将 src 属性改为你的微信收款二维码图片路径
+    3. 同时将上一个div (.qr-center-icon) 注释掉或删除
+    4. 支付宝卡片同理
+    5. 如有需要，调整图片样式保证完全覆盖 .qr-mok 区域 (现有注释内已包含样式)
+-->
+</body>
+</html>
