@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>赞赏支持</title>
+    <style>
+        :root {
+            --primary-color: #f39c12;
+            --bg-color: #f8f9fa;
+        }
+        /* 清除系统点击高亮 */
+        * { -webkit-tap-highlight-color: transparent; outline: none; }
+
+        body { 
+            font-family: 'Segoe UI', system-ui, sans-serif; 
+            background-color: var(--bg-color); 
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; margin: 0; overflow: hidden;
+            position: relative; cursor: pointer;
+        }
+
+        /* 35粒子、3秒超长爆炸时间 */
+        .particle {
+            position: fixed; border-radius: 50%; pointer-events: none; z-index: 9999;
+            /* 时间调至 3s，使用更平滑的减速曲线 */
+            animation: explode 3s cubic-bezier(0.075, 0.82, 0.165, 1) forwards;
+        }
+        @keyframes explode {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            70% { opacity: 0.9; } /* 延长可见时间 */
+            100% { 
+                transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0); 
+                opacity: 0; 
+            }
+        }
+
+        .reward-container { 
+            background: white; padding: 2rem; border-radius: 15px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; 
+            max-width: 420px; width: 92%; position: relative; z-index: 10;
+        }
+
+        .qr-area { 
+            min-height: 300px; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; 
+            border: 1px dashed #ddd; border-radius: 12px; padding: 15px;
+        }
+
+        .payment-tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 20px; }
+        .tab-btn { 
+            border: 1px solid #ddd; background: white; padding: 7px 12px; 
+            border-radius: 20px; cursor: pointer; font-size: 0.8rem; transition: 0.3s;
+        }
+        .tab-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+        
+        .pay-box { display: none; flex-direction: column; align-items: center; width: 100%; animation: fadeIn 0.4s; }
+        .pay-box.active { display: flex; }
+        .qr-code { max-width: 200px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #f0f0f0; }
+        
+        .jump-btn { 
+            display: inline-block; width: 85%; padding: 12px; color: white; 
+            border-radius: 10px; text-decoration: none; font-size: 14px; font-weight: bold;
+        }
+        
+        .address-box { 
+            background: #f4f4f4; padding: 12px; font-size: 0.75rem; 
+            word-break: break-all; border-radius: 8px; margin-bottom: 10px; 
+            width: 85%; border: 1px solid #eee;
+        }
+
+        #toast {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.8); color: white; padding: 8px 20px;
+            border-radius: 20px; font-size: 13px; z-index: 10001;
+            display: none;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body onclick="createFirework(event)">
+
+<div id="toast">地址已复制</div>
+
+<div class="reward-container">
+    <h2 style="margin-top:0; color:#333;">☕ 赞赏支持</h2>
+    <p style="font-size:0.8rem; color:#888; margin-bottom:1.5rem;">点击页面触发 3秒 长效烟花</p>
+
+    <div class="payment-tabs">
+        <button class="tab-btn active" onclick="showPay('wechat', event)">微信</button>
+        <button class="tab-btn" onclick="showPay('alipay', event)">支付宝</button>
+        <button class="tab-btn" onclick="showPay('qq', event)">QQ钱包</button>
+        <button class="tab-btn" onclick="showPay('paypal', event)">PayPal</button>
+        <button class="tab-btn" onclick="showPay('usdt', event)">USDT</button>
+    </div>
+
+    <div class="qr-area">
+        <div id="wechat" class="pay-box active">
+            <img class="qr-code" src="wechat.png" alt="微信">
+            <a href="weixin://" class="jump-btn" style="background:#07c160;">打开微信</a>
+        </div>
+        <div id="alipay" class="pay-box">
+            <img class="qr-code" src="alipay.png" alt="支付宝">
+            <a href="https://qr.alipay.com/fkx16600ru7g5nxeiohyk2b" class="jump-btn" style="background:#1677ff;">打开支付宝</a>
+        </div>
+        <div id="qq" class="pay-box">
+            <img class="qr-code" src="QQ.png" alt="QQ">
+            <a href="mqqapi://forward/url?url_prefix=" class="jump-btn" style="background:#12b7f5;">打开QQ</a>
+        </div>
+        <div id="paypal" class="pay-box">
+            <img class="qr-code" src="https://www.paypalobjects.com/digitalassets/c/website/logo/full-text/pp_fc_hl.svg" alt="Paypal">
+            <a href="https://paypal.me/Fly4024" target="_blank" class="jump-btn" style="background:#003087;">前往 PayPal.me</a>
+        </div>
+        <div id="usdt" class="pay-box">
+            <img class="qr-code" src="USDT.png" alt="USDT">
+            <div class="address-box">
+                TRC20 地址:<br><strong>TVpQGTxEJPrfEEWQW5xoSa1h2LBf6a8qyq</strong>
+            </div>
+            <a href="javascript:void(0)" onclick="copyAddress('TVpQGTxEJPrfEEWQW5xoSa1h2LBf6a8qyq')" class="jump-btn" style="background:#26a17b;">点击复制地址</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showPay(type, e) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        e.target.classList.add('active');
+        document.querySelectorAll('.pay-box').forEach(el => el.classList.remove('active'));
+        document.getElementById(type).classList.add('active');
+    }
+
+    function copyAddress(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            const toast = document.getElementById('toast');
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 2000);
+        });
+    }
+
+    function createFirework(e) {
+        const colors = ['#ff595e', '#ffca3a', '#8ac926', '#1982c4', '#6a4c93', '#f39c12', '#00d2ff', '#ff00ff'];
+        const particleCount = 35;
+
+        for (let i = 0; i < particleCount; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.background = colors[Math.floor(Math.random() * colors.length)];
+            p.style.left = e.clientX + 'px';
+            p.style.top = e.clientY + 'px';
+            
+            const angle = Math.random() * Math.PI * 2;
+            const dist = Math.random() * 300 + 150; // 扩散半径增大，匹配 3秒 时间
+            p.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+            p.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
+            
+            const size = Math.random() * 9 + 3 + 'px';
+            p.style.width = size; p.style.height = size;
+
+            document.body.appendChild(p);
+            
+            // 3000ms 后清理内存
+            setTimeout(() => p.remove(), 3000);
+        }
+    }
+</script>
+</body>
+</html>
